@@ -250,7 +250,7 @@
                      <div class="toggle__pointer color6"></div>
                   </div>
                   <div class="item">
-                     <h2 id="six">Unknown</h2>
+                     <h2>Unknown</h2>
                   </div>
                 </div>
 
@@ -261,7 +261,7 @@
                      <div class="toggle__pointer color7"></div>
                   </div>
                   <div class="item">
-                     <h2 id="two">Multiple</h2>
+                     <h2>Multiple</h2>
                   </div>
                 </div>
               </div>
@@ -561,7 +561,6 @@
                  lat = +row.Latitude;
                }
 
-
                // to deal with null lat lon values
 
               if(row.Sum =='' || row.Sum==null || row.Sum==''){
@@ -618,7 +617,13 @@
                       'Multiple': +row.Multiple,
                       'Aonyx_cinereus': +row.Aonyx_cinereus,
                       'Lutrogale_perspicillata': +row.Lutrogale_perspicillata,
-                      'Lutra_sumatrana': +row.Lutra_sumatrana
+                      'Skin': +row.Skin,
+                      'Tail': +row.Tail,
+                      'Pet': +row.Pet,
+                      'Unknown': +row.Unknown,
+                      'Piece': +row.Piece,
+                      'Many': +row.Many,
+                      'Carcass': +row.Carcass
                   },
                   'geometry': {
                       'type': 'Point',
@@ -632,6 +637,8 @@
               }
 
           });
+
+          //console.log(min)
 
 
           //*****************************
@@ -722,7 +729,6 @@
           var svg = d3.select("#chart").append("svg").attr("width", width).attr("height", height);
 
 
-
           //*****************************
           // Prepare data for stacked bar
           //*****************************
@@ -739,6 +745,13 @@
               d.Aonyx_cinereus = +d.Aonyx_cinereus;
               d.Lutrogale_perspicillata = +d.Lutrogale_perspicillata;
               d.Lutra_sumatrana = +d.Lutra_sumatrana;
+              d.Skin=+d.Skin,
+              d.Tail=+d.Tail,
+              d.Pet=+d.Pet,
+              d.Unknown=+d.Unknown,
+              d.Piece=+d.Piece,
+              d.Many=+d.Many,
+              d.Carcass=+d.Carcass,
               d.Latitude = +d.Latitude;
               d.Longitude = +d.Longitude;
               d['date'] = parser(d.Year)
@@ -784,39 +797,85 @@
               .call(d3.axisLeft(yScale));
 
 
+          //*********************************************************
+          // function to draw rects. called by slider and filter year
+          //*********************************************************
+
           function drawRects(year, cumul) {
-            if (cumul) {
-                d3.selectAll('rect').attr('fill', function(el) {
-                    var texture = textures
-                        .lines()
-                        .size(4)
-                        .strokeWidth(1)
-                        .stroke(color(el.data.Species1));
-                    svg.call(texture);
-                    if (el.data.Year <= year) {
-                        return texture.url()
-                    } else {
-                        return color(el.data.Species1)
-                    }
-                });
 
-            } else {
+            if(tab1){ // if spp tab
 
-                d3.selectAll('rect').attr('fill', el => color(el.data.Species1)); //reset all rect colors
-                d3.selectAll('rect').attr('fill', function(el) {
-                    var texture = textures
-                        .lines()
-                        .size(4)
-                        .strokeWidth(1)
-                        .stroke(color(el.data.Species1));
-                    svg.call(texture);
-                    if (el.data.Year == year) {
-                        return texture.url()
-                    } else {
-                        return color(el.data.Species1)
-                    }
-                });
+              if (cumul) {
+                  d3.selectAll('rect').attr('fill', function(el) {
+                      var texture = textures
+                          .lines()
+                          .size(4)
+                          .strokeWidth(1.5)
+                          .stroke(color(el.data.Species1));
+                      svg.call(texture);
+                      if (el.data.Year <= year) {
+                          return texture.url()
+                      } else {
+                          return color(el.data.Species1)
+                      }
+                  });
+
+              } else {
+
+                  d3.selectAll('rect').attr('fill', el => color(el.data.Species1)); //reset all rect colors
+                  d3.selectAll('rect').attr('fill', function(el) {
+                      var texture = textures
+                          .lines()
+                          .size(4)
+                          .strokeWidth(1.5)
+                          .stroke(color(el.data.Species1));
+                      svg.call(texture);
+                      if (el.data.Year == year) {
+                          return texture.url()
+                      } else {
+                          return color(el.data.Species1)
+                      }
+                  });
+              }
+
+            }else{ // if use tab
+
+              if (cumul) {
+                  d3.selectAll('rect').attr('fill', function(el) {
+                      var texture = textures
+                          .lines()
+                          .size(4)
+                          .strokeWidth(1.5)
+                          .stroke(colorUse(el.data.Use));
+                      svg.call(texture);
+                      if (el.data.Year <= year) {
+                          return texture.url()
+                      } else {
+                          return colorUse(el.data.Use)
+                      }
+                  });
+
+              } else {
+
+                  d3.selectAll('rect').attr('fill', el => colorUse(el.data.Use)); //reset all rect colors
+                  d3.selectAll('rect').attr('fill', function(el) {
+                      var texture = textures
+                          .lines()
+                          .size(4)
+                          .strokeWidth(1.5)
+                          .stroke(colorUse(el.data.Use));
+                      svg.call(texture);
+                      if (el.data.Year == year) {
+                          return texture.url()
+                      } else {
+                          return colorUse(el.data.Use)
+                      }
+                  });
+              }
+
+
             }
+
           }
 
           //*************
@@ -911,14 +970,66 @@
            //grouped bar
            //**************
 
+           // go over data, and group by year + use or year + spp and sum for that year
+
+           // var nestedSpp = d3.nest()
+           //    .key(function(d) {return d.Year;})
+           //    .rollup(function(d) {
+           //      //console.log(d)
+           //      return {
+           //          Species: d[0].Species1,
+           //          Lutra_lutra: d3.sum(d, function(e) { return e.Lutra_lutra; }),
+           //          Not_identified: d3.sum(d, function(e) { return e.Not_identified; }),
+           //          Unsure: d3.sum(d, function(e) { return e.Unsure; }),
+           //          Multiple: d3.sum(d, function(e) { return e.Multiple; }),
+           //          Aonyx_cinereus: d3.sum(d, function(e) { return e.Aonyx_cinereus; }),
+           //          Lutrogale_perspicillata: d3.sum(d, function(e) { return e.Lutrogale_perspicillata; }),
+           //          Lutra_sumatrana: d3.sum(d, function(e) { return e.Lutra_sumatrana; })
+           //      };
+           //
+           //    })
+           //    .entries(data);
+           //    console.log(nestedSpp)
+           //
+           //    var flatSpp = []
+           //      nestedSpp.forEach(function(d) {
+           //        console.log(d.value)
+           //
+           //          flatSpp.push({
+           //            species: d.value.Species,
+           //            year: +d.key,
+           //            Lutra_lutra: d.value.Lutra_lutra,
+           //            Not_identified: d.value.Not_identified,
+           //            Unsure: d.value.Unsure,
+           //            Multiple: d.value.Multiple,
+           //            Aonyx_cinereus: d.value.Aonyx_cinereus,
+           //            Lutrogale_perspicillata: d.value.Lutrogale_perspicillata,
+           //            Lutra_sumatrana: d.value.Lutra_sumatrana
+           //          });
+           //
+           //      });
+
+
+
            var stack = d3.stack()
                .keys(["Lutra_lutra","Not_identified","Unsure","Multiple","Aonyx_cinereus","Lutrogale_perspicillata","Lutra_sumatrana"])
 
            var stackUse = d3.stack()
-               .keys(["Tail","Multiple","Unknown","Carcass","Skin","Piece","Pet"]);
+               .keys(["Pet","Tail","Many","Unknown","Carcass","Skin","Piece"]);
 
            var series = stack(data);
            var seriesUse = stackUse(data);
+
+           console.log(series);
+
+           var arr1 = series[0];
+
+           arr1.filter(function(d){
+             return (d[0]!=0) && (d[1]!=0)
+           });
+           // WHY IS THIS NOT WORKING????
+
+
 
            var xScaleBar = d3.scaleBand().domain(data.map(function(d) {
                    return d.date;
@@ -929,35 +1040,44 @@
            var color = d3.scaleOrdinal().domain(["Lutra_lutra","Not_identified","Unsure","Multiple","Aonyx_cinereus","Lutrogale_perspicillata","Lutra_sumatrana"])
            .range(["#008695", "#f97b72","#A5AA99","#CF1C90","#80BA5A","#F2B701","#3969AC"]);
 
-           var colorUse = d3.scaleOrdinal().domain(["Tail","Multiple","Unknown","Carcass","Skin","Piece","Pet"])
+           var colorUse = d3.scaleOrdinal().domain(["Tail","Many","Unknown","Carcass","Skin","Piece","Pet"])
            .range(["#008695", "#f97b72","#A5AA99","#CF1C90","#80BA5A","#F2B701","#3969AC"]);
 
            // Create groups for each series, rects for each segment
            var groups = svg.selectAll("g.spp")
                .data(series)
                .join("g")
-               .attr("class", "spp");
+               .attr("class", "spp")
+               // .attr("fill",function(d){
+               //     var texture = textures
+               //         .lines()
+               //         .size(4)
+               //         .strokeWidth(1.5)
+               //         .stroke(color(d.key));
+               //         svg.call(texture);
+               //      return texture.url();
+               // })
 
            var rect = groups.selectAll("rect")
                .data(d=>d)
                .join("rect")
                .attr("class",d=>`${d.data.Species1} year${d.data.Year}`)
-               .attr("y", d => yScale(d[1]))
+               .attr("y", d =>  yScale(d[1]))
                .attr("x", (d, i) => xScale(d.data.date))
                .attr("width", 15)
                .attr("stroke","black")
-               .attr("stroke-width",0.3)
+               .attr("stroke-width",0.4)
                .attr("fill",function(d){
                    var texture = textures
                        .lines()
                        .size(4)
-                       .strokeWidth(1)
+                       .strokeWidth(1.5)
                        .stroke(color(d.data.Species1));
                        svg.call(texture);
                     return texture.url();
                })
                .attr("id",function(d,i){
-                 return d.data.Species1+"_"+d.data.Year
+                  return d.data.Species1+"_"+i+"_"+d.data.Year
                })
                .attr("height", d => yScale(d[0]) - yScale(d[1]))
                .on('mouseover', function(d){
@@ -974,6 +1094,85 @@
                .on('click',clicked);
 
 
+               function updateStackedBar(){
+                 if(tab1){ //if species
+
+                   groups = svg.selectAll("g.spp")
+                       .data(series)
+                       .join("g")
+                       .attr("class", "spp")
+                       // .attr("fill",function(d){
+                       //     var texture = textures
+                       //         .lines()
+                       //         .size(4)
+                       //         .strokeWidth(1.5)
+                       //         .stroke(color(d.key));
+                       //         svg.call(texture);
+                       //      return texture.url();
+                       // })
+
+                   rect = groups.selectAll("rect")
+                       .data(d=>d)
+                       .join("rect")
+                       .attr("class",d=>`${d.data.Species1} year${d.data.Year}`)
+                       .attr("y", d => yScale(d[1]))
+                       .attr("x", (d, i) => xScale(d.data.date))
+                       .attr("width", 15)
+                       .attr("stroke","black")
+                       .attr("stroke-width",0.3)
+                       .attr("fill",function(d){
+                           var texture = textures
+                               .lines()
+                               .size(4)
+                               .strokeWidth(1.5)
+                               .stroke(color(d.data.Species1));
+                               svg.call(texture);
+                            return texture.url();
+                       })
+                       .attr("id",function(d,i){
+                         return d.data.Species1+"_"+i+"_"+d.data.Year
+                       })
+                       .attr("height", d => yScale(d[0]) - yScale(d[1]));
+
+                 }else{ //if use
+
+                   groups = svg.selectAll("g.spp").data(seriesUse).join("g").attr("class", "spp")
+                   // .attr("fill",function(d){
+                   //     var texture = textures
+                   //         .lines()
+                   //         .size(4)
+                   //         .strokeWidth(1.5)
+                   //         .stroke(colorUse(d.key));
+                   //         svg.call(texture);
+                   //      return texture.url();
+                   // });
+
+                   rect = groups.selectAll("rect")
+                       .data(d=>d)
+                       .join("rect")
+                       .attr("class",d=>`${d.data.Use} year${d.data.Year}`)
+                       .attr("y", d => yScale(d[1]))
+                       .attr("x", (d, i) => xScale(d.data.date))
+                       .attr("width", 15)
+                       .attr("stroke","black")
+                       .attr("stroke-width",0.3)
+                       .attr("fill",function(d){
+                           var texture = textures
+                               .lines()
+                               .size(4)
+                               .strokeWidth(1.5)
+                               .stroke(colorUse(d.data.Use));
+                               svg.call(texture);
+                            return texture.url();
+                       })
+                       .attr("id",function(d,i){
+                         return d.data.Use+"_"+i+"_"+d.data.Year
+                       })
+                       .attr("height", d => yScale(d[0]) - yScale(d[1]));
+                 }
+               }
+
+
                 function clicked(d){
                   //console.log(d3.select(this.parentNode).datum())
 
@@ -981,6 +1180,9 @@
 
                   var id = this.id;
                   var year = id.substr(id.length - 4);
+                  //console.log(id)
+
+                  if(tab1){
 
                   d3.selectAll('rect').attr('fill',el=>color(el.data.Species1));
 
@@ -988,25 +1190,48 @@
                     var texture = textures
                         .lines()
                         .size(4)
-                        .strokeWidth(1)
+                        .strokeWidth(1.5)
                         .stroke(color(el.data.Species1));
                     svg.call(texture);
                     return texture.url()});
 
-
-                    var speciesClicked = d.data.Species1.replaceAll("_"," ")
                     var yearClicked = d.data.Year;
                     sliderValG = yearClicked
                     d3.select("#slider").property("value", yearClicked);
                     document.getElementById('selectedYear').innerText = yearClicked;
-                    speciesFilter = ["in", ["get", "species"], ["literal", activeSpecies]];
+                    // speciesFilter = ["in", ["get", "species"], ["literal", activeSpecies]];
                     yearFilter =  ['==', ['get','year'], yearClicked];
-                    map.setFilter('otters', ['all', speciesFilter,yearFilter]);
+                    map.setFilter('otters', ['all', useFilter, speciesFilter,yearFilter]);
+
+                  }else{
+
+                    d3.selectAll('rect').attr('fill',el=>colorUse(el.data.Use));
+
+                    d3.selectAll(`.year${year}`).attr('fill', function(el){
+                      var texture = textures
+                          .lines()
+                          .size(4)
+                          .strokeWidth(1.5)
+                          .stroke(colorUse(el.data.Use));
+                      svg.call(texture);
+                      return texture.url()});
+
+                      var yearClicked = d.data.Year;
+                      sliderValG = yearClicked
+                      d3.select("#slider").property("value", yearClicked);
+                      document.getElementById('selectedYear').innerText = yearClicked;
+                      // speciesFilter = ["in", ["get", "species"], ["literal", activeSpecies]];
+                      yearFilter =  ['==', ['get','year'], yearClicked];
+                      map.setFilter('otters', ['all', useFilter, speciesFilter,yearFilter]);
+
+                  }
 
                 }
 
 
+               //redraw doesn't work across modes (species vs use)
                function redraw(newdata){
+
 
                 // update the y scale
                 yScale.domain([0,d3.max(newdata, d=>d.Sum)]);
@@ -1020,6 +1245,8 @@
                       .attr("class", "spp");
 
                //below have not been updated
+
+               if(tab1){
 
                rect = groups.selectAll("rect")
                    .data(d=>d)
@@ -1036,7 +1263,7 @@
                           var texture = textures
                               .lines()
                               .size(4)
-                              .strokeWidth(1)
+                              .strokeWidth(1.5)
                               .stroke(color(d.data.Species1));
                           svg.call(texture);
                           if(d.data.Year <= sliderValG){ return texture.url()}
@@ -1047,7 +1274,7 @@
                          var texture = textures
                              .lines()
                              .size(4)
-                             .strokeWidth(1)
+                             .strokeWidth(1.5)
                              .stroke(color(d.data.Species1));
                          svg.call(texture);
                          if(d.data.Year == sliderValG){ return texture.url()}
@@ -1057,7 +1284,7 @@
                      }
                    })
                    .attr("id",function(d,i){
-                     return d.data.Species1+"_"+d.data.Year
+                     return d.data.Species1+"_"+i+"_"+d.data.Year
                    }).on('mouseover', function(d){
                        var id = this.id;
                        var year = id.substr(id.length - 4);
@@ -1070,6 +1297,62 @@
                        $(".spp rect").css("stroke-width",0.3);
                    })
                    .on('click',clicked); //clicked on working
+
+                 }else{
+
+                   rect = groups.selectAll("rect")
+                       .data(d=>d)
+                       .join('rect')
+                       .attr("height", d => yScale(d[0]) - yScale(d[1]))
+                       .attr("class",d=>`${d.data.Use} year${d.data.Year}`)
+                       .attr("y", d => yScale(d[1]))
+                       .attr("x", (d, i) => xScale(d.data.date))
+                       .attr("width", 15)
+                       .attr("stroke","black")
+                       .attr("stroke-width",0.3)
+                       .attr("fill",function(d){
+                         if(cumulative){
+                              var texture = textures
+                                  .lines()
+                                  .size(4)
+                                  .strokeWidth(1.5)
+                                  .stroke(colorUse(d.data.Use));
+                              svg.call(texture);
+                              if(d.data.Year <= sliderValG){ return texture.url()}
+                              else{
+                                return colorUse(d.data.Use)
+                              }
+                         }else{
+                             var texture = textures
+                                 .lines()
+                                 .size(4)
+                                 .strokeWidth(1.5)
+                                 .stroke(colorUse(d.data.Use));
+                             svg.call(texture);
+                             if(d.data.Year == sliderValG){ return texture.url()}
+                             else{
+                               return colorUse(d.data.Use)
+                             }
+                         }
+                       })
+                       .attr("id",function(d,i){
+                         return d.data.Use+"_"+i+"_"+d.data.Year
+                       }).on('mouseover', function(d){
+                           var id = this.id;
+                           var year = id.substr(id.length - 4);
+                           if(cumulative){
+                             $(`*[id$=${year}]`).css("cursor","pointer");
+                             $(`*[id$=${year}]`).css("stroke-width",1.2);
+                           }
+                       })
+                       .on('mouseout', function(d){
+                           $(".spp rect").css("stroke-width",0.3);
+                       })
+                       .on('click',clicked); //clicked on working
+
+                 }
+
+
               }
 
 
@@ -1105,12 +1388,13 @@
               //*********************
 
               var pathsClose = [`M10.2,10.8c1.7,0,3-1.3,3-3c0,0,0,0,0,0L10.2,10.8C10.2,10.8,10.2,10.8,10.2,10.8z`,
-              `M3.8,11.9l1.4-1.4C4.1,9.8,3.1,8.9,2.3,7.8c1.8-2.5,4.8-4,7.9-4c0.5,0,1,0.1,1.6,0.1l1.7-1.7c-1-0.3-2.1-0.5-3.2-0.5
+                `M3.8,11.9l1.4-1.4C4.1,9.8,3.1,8.9,2.3,7.8c1.8-2.5,4.8-4,7.9-4c0.5,0,1,0.1,1.6,0.1l1.7-1.7c-1-0.3-2.1-0.5-3.2-0.5
                 c-4.1,0-7.9,2.1-9.9,5.5c-0.2,0.3-0.2,0.7,0,1C1.2,9.8,2.4,11,3.8,11.9z`,
                 `M20.1,7.3C19.3,6,18.2,4.9,17,4l-1.4,1.4C16.5,6,17.3,6.8,18,7.8c-1.7,2.5-4.6,4-7.8,4c-0.3,0-0.6,0-1-0.1l-1.7,1.7
                   c0.9,0.2,1.8,0.3,2.7,0.3c4.1,0,7.8-2.1,9.9-5.5C20.3,8,20.3,7.6,20.1,7.3z`,
                   `M10.2,4.8c-0.6,0-1,0.4-1,1c0,0.2,0.1,0.4,0.2,0.5l1.5-1.5C10.6,4.8,10.4,4.8,10.2,4.8z`,
-                  `M8.2,6.8c-0.6,0-1,0.4-1,1c0,0.2,0,0.4,0.1,0.6l1.5-1.5C8.6,6.9,8.4,6.8,8.2,6.8z`]
+                  `M8.2,6.8c-0.6,0-1,0.4-1,1c0,0.2,0,0.4,0.1,0.6l1.5-1.5C8.6,6.9,8.4,6.8,8.2,6.8z`];
+
               var pathClose = `M3.8,15.7c-0.3,0-0.6-0.1-0.8-0.3c-0.2-0.2-0.4-0.5-0.3-0.9c0-0.3,0.1-0.6,0.4-0.8l13-13c0.2-0.2,0.5-0.3,0.8-0.3
                 s0.6,0.1,0.8,0.3c0.5,0.5,0.5,1.2,0,1.7l-13,13C4.4,15.6,4.1,15.7,3.8,15.7z`;
 
@@ -1174,7 +1458,7 @@
 
                   var newdata = data.filter(function (d) {
                         // d.Speices not in array
-                        return activeSpecies.indexOf(d.Species) > -1;
+                        return activeSpecies.indexOf(d.Species) > -1 && activeUse.indexOf(d.Use) > -1;
                   });
 
                   redraw(newdata)
@@ -1202,7 +1486,7 @@
 
                 var newdata = data.filter(function (d) {
                       // d.Speices not in array
-                      return activeSpecies.indexOf(d.Species) > -1;
+                      return activeSpecies.indexOf(d.Species) > -1 && activeUse.indexOf(d.Use) > -1;
                 });
                 //console.log(newdata2)
 
@@ -1232,33 +1516,54 @@
 
          function createFilterUse(filterName,layerOnName,useString){
           document.getElementById(filterName).addEventListener('change', function(e) {
-             // update the map filter
-             if (e.target.value === layerOnName) {
-               //if layer doesn't exist then push
-               if(activeUse.indexOf(useString) == -1){
-                 activeUse.push(useString)
-               }
-               console.log(activeUse)
+            // update the map filter
+            if (e.target.value === layerOnName) {
+              //if layer doesn't exist then push
 
-               speciesFilter = ["in", ["get", "species"], ["literal", activeSpecies]];
-               useFilter = ["in", ["get", "use"], ["literal", activeUse]];
-               // map.setFilter('plants', ['all', speciesFilter,useFilter,yearFilter]);
-               map.setFilter('otters', ['all', speciesFilter,useFilter,yearFilter]);
+              if(activeUse.indexOf(useString) == -1){
+                activeUse.push(useString)
+              }
 
-             } else {
-               //console.log(activeSpecies)
-               //if layer exists then remove it
-               if(activeUse.indexOf(useString) !== -1){
-                 var index = activeUse.indexOf(useString);
-                     activeUse.splice(index, 1);
-               }
-             //  console.log(activeSpecies)
-             speciesFilter = ["in", ["get", "species"], ["literal", activeSpecies]];
-             useFilter = ["in", ["get", "use"], ["literal", activeUse]];
-             // map.setFilter('plants', ['all', speciesFilter,useFilter,yearFilter]);
-             map.setFilter('otters', ['all', speciesFilter,useFilter,yearFilter]);
+              var newdata = data.filter(function (d) {
+                    return activeSpecies.indexOf(d.Species) > -1 && activeUse.indexOf(d.Use) > -1;
+              });
 
-             }
+              redraw(newdata)
+
+              useFilter = ["in", ["get", "use"], ["literal", activeUse]];
+
+              if(cumulative){
+                 yearFilter =  ['<=', ['get','year'], sliderValG];
+              }else{
+                yearFilter = ["==", ["get", "year"], sliderValG];
+              }
+
+              // map.setFilter('plants', ['all', speciesFilter,useFilter,yearFilter]);
+              map.setFilter('otters', ['all', speciesFilter,useFilter,yearFilter]);
+
+            } else { //if turn layer off
+
+              //if layer exists then remove it
+              if(activeUse.indexOf(useString) !== -1){
+                var index = activeUse.indexOf(useString);
+                    activeUse.splice(index, 1);
+              }
+
+            var newdata = data.filter(function (d) {
+                  return activeSpecies.indexOf(d.Species) > -1 && activeUse.indexOf(d.Use) > -1;
+            });
+
+            redraw(newdata);
+
+            useFilter = ["in", ["get", "use"], ["literal", activeUse]];
+            if(cumulative){
+               yearFilter =  ['<=', ['get','year'], sliderValG];
+            }else{
+              yearFilter = ["==", ["get", "year"], sliderValG];
+            }
+            map.setFilter('otters', ['all', speciesFilter,useFilter,yearFilter]);
+
+            }
 
          });
        }
@@ -1360,7 +1665,7 @@
            var texture = textures
                .lines()
                .size(4)
-               .strokeWidth(1)
+               .strokeWidth(1.5)
                .stroke(color(el.data.Species1));
            svg.call(texture);
            return texture.url()});
@@ -1418,6 +1723,16 @@
               }
 
               if(tab1){
+
+                updateStackedBar();
+
+                var newdata = data.filter(function (d) {
+                      // d.Speices not in array
+                      return activeSpecies.indexOf(d.Species) > -1 && activeUse.indexOf(d.Use) > -1;
+                });
+
+                redraw(newdata)
+
                 $("#toggleConsole").css("top", 330);
                 if(medium){
                   $("#toggleConsole").css("top", 260);
@@ -1446,6 +1761,15 @@
 
 
               }else{
+
+                updateStackedBar();
+
+                var newdata = data.filter(function (d) {
+                      // d.Speices not in array
+                      return activeSpecies.indexOf(d.Species) > -1 && activeUse.indexOf(d.Use) > -1;
+                });
+
+                redraw(newdata)
 
                 $("#toggleConsole").css("top", 310);
                 if(medium){
