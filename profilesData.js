@@ -5,8 +5,9 @@ var profilesData =[
 "name":"Asian Small-clawed Otter",
 "description":"",
 "range":"",
-"status":"VU",
-"img":"./img/img1.jpg"
+"status":"Vulnerable",
+"img":"./img/img1.jpg",
+"trade":"Pelt, pet (“otter cafes”)"
 },
 {
 "id": 2,
@@ -14,8 +15,9 @@ var profilesData =[
 "name":"Eurasian otter",
 "description":"",
 "range":"",
-"status":"NT",
-"img":"./img/img2.jpg"
+"status":"Near Threatened",
+"img":"./img/img2.jpg",
+"trade":"Pelt, meat and body parts"
 },
 {
 "id": 3,
@@ -23,8 +25,9 @@ var profilesData =[
 "name":"Hairy-nosed Otter",
 "description":"",
 "range":"",
-"status":"EN",
-"img":"./img/img3.jpg"
+"status":"Endangered",
+"img":"./img/img3.jpg",
+"trade":"Pelt, meat and body parts (for medicinal use), pet (rare but detrimental for this species because of its status and range)"
 },
 {
 "id": 4,
@@ -32,7 +35,8 @@ var profilesData =[
 "name":"Smooth-coated Otter",
 "description":"",
 "range":"",
-"status":"VU",
-"img":"./img/img4.jpg"
+"status":"Vulnerable",
+"img":"./img/img4.jpg",
+"trade":"Pelt, meat and body parts,pet (second most traded as pet of the 4 Asian otter species)"
 }
 ]

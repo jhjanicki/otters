@@ -34,7 +34,7 @@
             <div class="tab-slider--container">
               <div id="tab1" class="tab-slider--body">
 
-                <div class="itemWrapper">
+                <!-- <div class="itemWrapper">
                   <svg id="reset2" class="item" version="1.1" x="0px" y="0px"
                     viewBox="0 0 48.9 42" style="enable-background:new 0 0 48.9 42;" xml:space="preserve">
                   <g id="">
@@ -47,7 +47,7 @@
                   <div class="item">
                     <p> Reset Species</p>
                   </div>
-                </div>
+                </div> -->
                 <div class="itemWrapper">
                   <div class='row toggle item filters' id="filter1">
                      <input id='Aonyx_cinereus_on' type="radio" value="Aonyx_cinereus_on" name="toggle" checked='checked'>
@@ -178,7 +178,7 @@
               <!-- end tab 1 -->
               <div id="tab2" class="tab-slider--body">
 
-                <div class="itemWrapper">
+                <!-- <div class="itemWrapper">
                   <svg id="reset" class="item" version="1.1" x="0px" y="0px"
                     viewBox="0 0 48.9 42" style="enable-background:new 0 0 48.9 42;" xml:space="preserve">
                   <g id="">
@@ -191,7 +191,7 @@
                   <div class="item">
                     <p> Reset Use</p>
                   </div>
-                </div>
+                </div> -->
 
                 <div class="itemWrapper">
                   <div class='row toggle8 item filters' id="filter8">
@@ -320,9 +320,11 @@
             c0.4,0.4,0.4,1,0,1.4c-0.4,0.4-1,0.4-1.4,0C12.3,13.7,8.8,10.2,8.8,10.2z"/>
           </svg>
         <h4 id="profileSpp"> Otter profiles </h4>
-        <p id="profileSpp2"> Common name </p>
+        <p id="profileSpp2"></p>
         <img id="profileImg" src="" />
-        <p id="profileStatus"> IUCN Status </p>
+        <hr>
+        <p><b>IUCN Status: </b> <span id="profileStatus"></span></p>
+        <p><b>Traded For: </b> <span id="profileTrade"></span></p>
       </div>
 
       <div id="chart">
@@ -482,8 +484,7 @@
               $("#toggleConsole img").toggleClass("flip");
           });
 
-          // var consoleHeight = $("#console").height() / 2;
-          $("#toggleConsole").css("top", 310);
+          $("#toggleConsole").css("top", 230);
 
           if(medium){
             $("#toggleConsole").css("top", 250);
@@ -1349,9 +1350,7 @@
                            $(".spp rect").css("stroke-width",0.3);
                        })
                        .on('click',clicked); //clicked on working
-
                  }
-
 
               }
 
@@ -1369,6 +1368,7 @@
                   $("#profileSpp2").html(obj[0].name);
                   $("#profileImg").attr("src",obj[0].img);
                   $("#profileStatus").html(obj[0].status);
+                  $("#profileTrade").html(obj[0].trade);
                   d3.select("#profile").transition().duration(200).style("display","inherit").style("opacity",1);
                 });
               }
@@ -1582,62 +1582,65 @@
 
 
 
-       $("#reset2").click(function() {
-
-         for(var i=0; i<allSpecies.length;i++){
-           if(activeSpecies.indexOf(allSpecies[i]) == -1){
-             activeSpecies.push(allSpecies[i]);
-           }
-         }
-
-         var newdata = data.filter(function (d) {
-               // d.Speices not in array
-               return activeSpecies.indexOf(d.Species) > -1;
-         });
-
-         redraw(newdata)
-
-         speciesFilter = ["in", ["get", "species"], ["literal", activeSpecies]];
-         // useFilter = ["in", ["get", "use"], ["literal", activeUse]];
-         // yearFilter =  ['<=', ['get','year'], sliderValG];
-         map.setFilter('otters', ['all', speciesFilter,useFilter,yearFilter]);
-
-         $("#Aonyx_cinereus_on").prop('checked', true);
-         $("#Aonyx_cinereus_off").prop('checked', false);
-         $("#Lutra_lutra_on").prop('checked', true);
-         $("#Lutra_lutra_off").prop('checked', false);
-         $("#Lutra_sumatrana_on").prop('checked', true);
-         $("#Lutra_sumatrana_off").prop('checked', false);
-         $("#Lutrogale_perspicillata_on").prop('checked', true);
-         $("#Lutrogale_perspicillata_off").prop('checked', false);
-         $("#Multiple_on").prop('checked', true);
-         $("#Multiple_off").prop('checked', false);
-         $("#Unsure_on").prop('checked', true);
-         $("#Unsure_off").prop('checked', false);
-         $("#Not_identified_on").prop('checked', true);
-         $("#Not_identified_off").prop('checked', false);
-
-       });
-       //
-       //
        // $("#reset2").click(function() {
        //
-       //   for(var i=0; i<allFuels.length;i++){
-       //     if(activeUse.indexOf(allFuels[i]) == -1){
-       //       activeUse.push(allFuels[i]);
+       //   for(var i=0; i<allSpecies.length;i++){
+       //     if(activeSpecies.indexOf(allSpecies[i]) == -1){
+       //       activeSpecies.push(allSpecies[i]);
        //     }
        //   }
-       //   speciesFilter = ["in", ["get", "status"], ["literal", activeSpecies]];
-       //   useFilter = ["in", ["get", "mainFuel"], ["literal", activeUse]];
-       //   yearFilter =  ['>=', ['get','capacity'], sliderValG];
-       //   // yearFilter =  ['>=', ['get','capacity'], 1];
-       //   map.setFilter('plants', ['all', speciesFilter,useFilter,yearFilter]);
-       //   // $("#slider").val(1);
-       //   // $("#slider").trigger('change');
+       //
+       //   var newdata = data.filter(function (d) {
+       //         // d.Speices not in array
+       //         return activeSpecies.indexOf(d.Species) > -1;
+       //   });
+       //
+       //   redraw(newdata)
+       //
+       //   speciesFilter = ["in", ["get", "species"], ["literal", activeSpecies]];
+       //   map.setFilter('otters', ['all', speciesFilter,yearFilter]);
+       //
+       //   $("#Aonyx_cinereus_on").prop('checked', true);
+       //   $("#Aonyx_cinereus_off").prop('checked', false);
+       //   $("#Lutra_lutra_on").prop('checked', true);
+       //   $("#Lutra_lutra_off").prop('checked', false);
+       //   $("#Lutra_sumatrana_on").prop('checked', true);
+       //   $("#Lutra_sumatrana_off").prop('checked', false);
+       //   $("#Lutrogale_perspicillata_on").prop('checked', true);
+       //   $("#Lutrogale_perspicillata_off").prop('checked', false);
+       //   $("#Multiple_on").prop('checked', true);
+       //   $("#Multiple_off").prop('checked', false);
+       //   $("#Unsure_on").prop('checked', true);
+       //   $("#Unsure_off").prop('checked', false);
+       //   $("#Not_identified_on").prop('checked', true);
+       //   $("#Not_identified_off").prop('checked', false);
+       //
+       // });
+       //
+       // //RESET USE
+       // $("#reset").click(function() {
+       //
+       //   for(var i=0; i<allUse.length;i++){
+       //     if(activeUse.indexOf(activeUse[i]) == -1){
+       //       activeUse.push(activeUse[i]);
+       //     }
+       //   }
+       //
+       //   var newdata = data.filter(function (d) {
+       //         return activeUse.indexOf(d.Use) > -1;
+       //   });
+       //
+       //   redraw(newdata)
+       //
+       //   useFilter = ["in", ["get", "use"], ["literal", activeUse]];
+       //   map.setFilter('otters', ['all',useFilter,yearFilter]);
+       //
+       //   $("#Skin_on").prop('checked', true);
+       //   $("#Skin_off").prop('checked', false);
        //   $("#Tail_on").prop('checked', true);
-       //   $("#layer9ff").prop('checked', false);
+       //   $("#Tail_off").prop('checked', false);
        //   $("#Pet_on").prop('checked', true);
-       //   $("#layer10ff").prop('checked', false);
+       //   $("#Pet_off").prop('checked', false);
        //   $("#Piece_on").prop('checked', true);
        //   $("#Piece_off").prop('checked', false);
        //   $("#Carcass_on").prop('checked', true);
@@ -1646,14 +1649,8 @@
        //   $("#Unknown_off").prop('checked', false);
        //   $("#Multiple2_on").prop('checked', true);
        //   $("#Multiple2_off").prop('checked', false);
-       //   $("#layer15On").prop('checked', true);
-       //   $("#layer15Off").prop('checked', false);
-       //   $("#layer16On").prop('checked', true);
-       //   $("#layer16Off").prop('checked', false);
        //
        // });
-       //
-       //
 
        // not working properly if I click on a year, deselct a spp then click on reset... it's still stuck on the year selected instead of 2019
        $("#reset3").click(function() {
@@ -1681,24 +1678,6 @@
          map.setFilter('otters', ['all', speciesFilter,useFilter,yearFilter]);
 
        });
-
-
-       //barFilter
-
-       // d3.selectAll("g.spp rect").on("click", d=> barClicked(d))
-       //
-       // function barClicked(d){
-       //
-       //   console.log(d)
-       //
-       //   var speciesClicked = d.data.Species.replaceAll("_"," ")
-       //   var yearClicked = d.data.Year;
-       //
-       //     speciesFilter = ["==", ["get", "species"], ["literal", speciesClicked]];
-       //     yearFilter =  ['==', ['get','year'], yearClicked];
-       //     map.setFilter('otters', ['all', speciesFilter,yearFilter]);
-       // }
-
 
 
           $("document").ready(function(){
@@ -1733,15 +1712,6 @@
 
                 redraw(newdata)
 
-                $("#toggleConsole").css("top", 330);
-                if(medium){
-                  $("#toggleConsole").css("top", 260);
-                }
-
-                if(mobile){
-                  $("#toggleConsole").css("top", 260);
-                }
-
                 map.setPaintProperty('otters',"circle-color", [
                      "case",
                      ["==", ["get", "species"], 'Aonyx cinereus'],
@@ -1771,15 +1741,6 @@
 
                 redraw(newdata)
 
-                $("#toggleConsole").css("top", 310);
-                if(medium){
-                  $("#toggleConsole").css("top", 250);
-                }
-
-                if(mobile){
-                  $("#toggleConsole").css("top", 240);
-                }
-
 
                   map.setPaintProperty('otters',"circle-color", [
                     "case",
@@ -1798,8 +1759,6 @@
                     "#f97b72"
                      ])
 
-
-
               }
 
               $("#"+activeTab).fadeIn();
@@ -1815,19 +1774,19 @@
 
 
 
-          // map.on('mouseleave', function() {
-          //     map.getCanvas().style.cursor = '';
-          //     // popup.270();
+          map.on('mouseleave', function() {
+              map.getCanvas().style.cursor = '';
+              // popup.270();
+          });
+
+          // $(".tab-slider--nav li").click(function() {
+          //   popup.remove();
           // });
-          //
-          // // $(".tab-slider--nav li").click(function() {
-          // //   popup.remove();
-          // // });
-          //
-          //
+
+
             map.on('click', 'otters', function(e) {
 
-              console.log(e)
+            //  console.log(e)
                 map.getCanvas().style.cursor = 'pointer';
 
                 var latitude = e.features[0].properties.latitude;
@@ -1850,56 +1809,54 @@
                 var color = "#80BA5A";
 
 
-                // if(tab1){
-                //   if(mainFuel== 'Gas natural'){
-                //     color = "#80BA5A";
-                //     popupClass="color1"
-                //   }else if(mainFuel== 'Gas propano'){
-                //     color = "#A5AA99";
-                //     popupClass="color6"
-                //   }else if(mainFuel== 'Carbón'){
-                //     color = "#008695";
-                //     popupClass="color2"
-                //   }else if(mainFuel== 'Petróleo'){
-                //     color = "#CF1C90";
-                //     popupClass="color5"
-                //   }else if(mainFuel== 'Fuel oil'){
-                //     color = "#3969AC";
-                //     popupClass="color3"
-                //   }else if(mainFuel== 'Diesel'){
-                //     color = "#F2B701";
-                //     popupClass="color4"
-                //   }else if(mainFuel== 'Coque de petróleo'){
-                //     color = "#f97b72";
-                //     popupClass="color7"
-                //   }else{
-                //     color = "#7F3C8D";
-                //     popupClass="color8"
-                //   }
-                // }else{
-                //   if(status== 'Activa'){
-                //     color = "#80BA5A";
-                //     popupClass="color1"
-                //   }else if(status== 'Cerrada'){
-                //     color = "#008695";
-                //     popupClass="color2"
-                //   }else if(status== 'Planeada'){
-                //     color = "#3969AC";
-                //     popupClass="color3"
-                //   }else if(status== 'Descartada'){
-                //     color = "#F2B701";
-                //     popupClass="color4"
-                //   }else if(status== 'En construcción'){
-                //     color = "#CF1C90";
-                //     popupClass="color5"
-                //   }else if(status== 'Paralizada'){
-                //     color = "#A5AA99";
-                //     popupClass="color6"
-                //   }else{
-                //     color = "#f97b72";
-                //     popupClass="color7"
-                //   }
-                // }
+                if(tab1){
+                  if(species== 'Aonyx cinereus'){
+                    color = "#80BA5A";
+                    popupClass="color1"
+                  }else if(species== 'Lutra lutra'){
+                    color = "#008695";
+                    popupClass="color2"
+                  }else if(species== 'Lutra sumatrana'){
+                    color = "#3969AC";
+                    popupClass="color3"
+                  }else if(species== 'Lutrogale perspicillata'){
+                    color = "#F2B701";
+                    popupClass="color4"
+                  }else if(species== 'Multiple'){
+                    color = "#CF1C90";
+                    popupClass="color5"
+                  }else if(species== 'Unsure'){
+                    color = "#A5AA99";
+                    popupClass="color6"
+                  }else{
+                    color = "#f97b72";
+                    popupClass="color7"
+                  }
+                }else{
+                  if(use== 'Skin'){
+                    color = "#80BA5A";
+                    popupClass="color1"
+                  }else if(use== 'Tail'){
+                    color = "#008695";
+                    popupClass="color2"
+                  }else if(use== 'Pet'){
+                    color = "#3969AC";
+                    popupClass="color3"
+                  }else if(use== 'Piece'){
+                    color = "#F2B701";
+                    popupClass="color4"
+                  }else if(use== 'Carcass'){
+                    color = "#CF1C90";
+                    popupClass="color5"
+                  }else if(use== 'Unknown'){
+                    color = "#A5AA99";
+                    popupClass="color6"
+                  }else{
+                    color = "#f97b72";
+                    popupClass="color7"
+                  }
+                }
+
 
                   popup = new mapboxgl.Popup({
                           closeButton: true,
